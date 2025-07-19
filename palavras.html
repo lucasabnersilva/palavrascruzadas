@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Palavras Cruzadas - Nomes dos Anos 2000</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            padding: 20px;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .game-area {
+            display: flex;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .crossword-container {
+            flex: 2;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(15, 40px);
+            grid-template-rows: repeat(15, 40px);
+            gap: 2px;
+            background: #f0f0f0;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: inset 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .cell {
+            width: 40px;
+            height: 40px;
+            border: 2px solid #ddd;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            background: white;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .cell.black {
+            background: #333;
+            border-color: #333;
+        }
+
+        .cell.active {
+            background: #fff;
+            border: 2px solid #4ecdc4;
+            box-shadow: 0 0 10px rgba(78, 205, 196, 0.3);
+        }
+
+        .cell.filled {
+            background: #e8f5e8;
+            border-color: #4caf50;
+        }
+
+        .cell.correct {
+            background: #c8e6c9;
+            border-color: #4caf50;
+            animation: pulse 0.6s ease-in-out;
+        }
+
+        .cell input {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: transparent;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            outline: none;
+        }
+
+        .cell .number {
+            position: absolute;
+            top: 2px;
+            left: 4px;
+            font-size: 12px;
+            color: #666;
+            font-weight: bold;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .clues-container {
+            flex: 1;
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            height: fit-content;
+        }
+
+        .clues h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            text-align: center;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .clues-section {
+            margin-bottom: 25px;
+        }
+
+        .clues-section h4 {
+            color: #555;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .clue {
+            margin-bottom: 8px;
+            padding: 8px 12px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .clue:hover {
+            background: #e3f2fd;
+            transform: translateY(-1px);
+        }
+
+        .clue span {
+            font-weight: bold;
+            color: #4ecdc4;
+        }
+
+        .controls {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .stats {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .stats span {
+            font-weight: bold;
+            color: #4ecdc4;
+        }
+
+        @media (max-width: 768px) {
+            .game-area {
+                flex-direction: column;
+            }
+            
+            .grid {
+                grid-template-columns: repeat(15, 25px);
+                grid-template-rows: repeat(15, 25px);
+            }
+            
+            .cell {
+                width: 25px;
+                height: 25px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Palavras Cruzadas</h1>
+            <p>Nomes Brasileiros Populares dos Anos 2000</p>
+        </div>
+
+        <div class="game-area">
+            <div class="crossword-container">
+                <div class="stats">
+                    Palavras encontradas: <span id="score">0</span>/12
+                </div>
+                <div class="grid" id="grid"></div>
+                <div class="controls">
+                    <button class="btn" onclick="checkAnswers()">Verificar Respostas</button>
+                    <button class="btn" onclick="clearGrid()">Limpar Tudo</button>
+                </div>
+            </div>
+
+            <div class="clues-container">
+                <h3>🔍 Dicas</h3>
+                
+                <div class="clues-section">
+                    <h4>↓ Verticais</h4>
+                    <div class="clue"><span>1.</span> Nome feminino que rima com "Bia"</div>
+                    <div class="clue"><span>2.</span> Nome simples e popular</div>
+                    <div class="clue"><span>3.</span> Nome masculino clássico</div>
+                    <div class="clue"><span>4.</span> Nome masculino muito comum</div>
+                    <div class="clue"><span>5.</span> Nome bíblico feminino</div>
+                    <div class="clue"><span>6.</span> Nome masculino de origem russa</div>
+                </div>
+
+                <div class="clues-section">
+                    <h4>→ Horizontais</h4>
+                    <div class="clue"><span>7.</span> Versão brasileira de John</div>
+                    <div class="clue"><span>8.</span> Nome feminino clássico</div>
+                    <div class="clue"><span>9.</span> Nome de arcanjo</div>
+                    <div class="clue"><span>10.</span> Nome relacionado ao mar</div>
+                    <div class="clue"><span>11.</span> Nome masculino romano</div>
+                    <div class="clue"><span>12.</span> Nome bíblico masculino</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Definição das palavras e suas posições
+        const words = [
+            { word: 'JULIA', row: 0, col: 2, direction: 'down', number: 1, clue: 'Nome feminino que rima com "Bia"' },
+            { word: 'ANA', row: 2, col: 6, direction: 'down', number: 2, clue: 'Nome simples e popular' },
+            { word: 'CARLOS', row: 0, col: 9, direction: 'down', number: 3, clue: 'Nome masculino clássico' },
+            { word: 'LUCAS', row: 3, col: 12, direction: 'down', number: 4, clue: 'Nome masculino muito comum' },
+            { word: 'SARA', row: 8, col: 4, direction: 'down', number: 5, clue: 'Nome bíblico feminino' },
+            { word: 'IVAN', row: 9, col: 11, direction: 'down', number: 6, clue: 'Nome masculino de origem russa' },
+
+            { word: 'JOAO', row: 5, col: 2, direction: 'right', number: 7, clue: 'Versão brasileira de John' },
+            { word: 'BEATRIZ', row: 6, col: 0, direction: 'right', number: 8, clue: 'Nome feminino clássico' },
+            { word: 'RAFAEL', row: 1, col: 8, direction: 'right', number: 9, clue: 'Nome de arcanjo' },
+            { word: 'MARINA', row: 9, col: 3, direction: 'right', number: 10, clue: 'Nome relacionado ao mar' },
+            { word: 'CAIO', row: 13, col: 9, direction: 'right', number: 11, clue: 'Nome masculino romano' },
+            { word: 'DANIEL', row: 10, col: 5, direction: 'right', number: 12, clue: 'Nome bíblico masculino' }
+        ];
+
+        const gridSize = 15;
+        let grid = [];
+        let currentWord = null;
+        let score = 0;
+
+        // Inicializar o grid
+        function initGrid() {
+            const gridElement = document.getElementById('grid');
+            grid = Array(gridSize).fill().map(() => Array(gridSize).fill({ type: 'black', letter: '', input: null }));
+
+            // Marcar células das palavras
+            words.forEach(wordObj => {
+                const { word, row, col, direction, number } = wordObj;
+                for (let i = 0; i < word.length; i++) {
+                    const r = direction === 'down' ? row + i : row;
+                    const c = direction === 'right' ? col + i : col;
+                    
+                    if (r < gridSize && c < gridSize) {
+                        grid[r][c] = {
+                            type: 'white',
+                            letter: word[i],
+                            number: i === 0 ? number : (grid[r][c].number || ''),
+                            input: null,
+                            wordIndex: words.indexOf(wordObj),
+                            letterIndex: i
+                        };
+                    }
+                }
+            });
+
+            // Criar elementos HTML
+            gridElement.innerHTML = '';
+            for (let r = 0; r < gridSize; r++) {
+                for (let c = 0; c < gridSize; c++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.dataset.row = r;
+                    cell.dataset.col = c;
+
+                    if (grid[r][c].type === 'black') {
+                        cell.classList.add('black');
+                    } else {
+                        const input = document.createElement('input');
+                        input.type = 'text';
+                        input.maxLength = 1;
+                        input.addEventListener('input', handleInput);
+                        input.addEventListener('keydown', handleKeydown);
+                        input.addEventListener('focus', handleFocus);
+                        
+                        cell.appendChild(input);
+                        grid[r][c].input = input;
+
+                        if (grid[r][c].number) {
+                            const numberDiv = document.createElement('div');
+                            numberDiv.className = 'number';
+                            numberDiv.textContent = grid[r][c].number;
+                            cell.appendChild(numberDiv);
+                        }
+
+                        // Mostrar primeira letra
+                        if (grid[r][c].letterIndex === 0) {
+                            input.value = grid[r][c].letter;
+                            input.style.color = '#666';
+                            input.readOnly = true;
+                            cell.classList.add('filled');
+                        }
+                    }
+
+                    gridElement.appendChild(cell);
+                }
+            }
+        }
+
+        function handleInput(e) {
+            const input = e.target;
+            input.value = input.value.toUpperCase();
+            
+            if (input.value && !input.readOnly) {
+                const row = parseInt(input.parentElement.dataset.row);
+                const col = parseInt(input.parentElement.dataset.col);
+                
+                // Move para próxima célula
+                moveToNext(row, col);
+            }
+        }
+
+        function handleKeydown(e) {
+            if (e.key === 'Backspace' && !e.target.value) {
+                const row = parseInt(e.target.parentElement.dataset.row);
+                const col = parseInt(e.target.parentElement.dataset.col);
+                moveToPrevious(row, col);
+            }
+        }
+
+        function handleFocus(e) {
+            const row = parseInt(e.target.parentElement.dataset.row);
+            const col = parseInt(e.target.parentElement.dataset.col);
+            
+            // Destacar palavra atual
+            highlightWord(row, col);
+        }
+
+        function moveToNext(row, col) {
+            // Encontrar próxima célula editável
+            for (let r = 0; r < gridSize; r++) {
+                for (let c = 0; c < gridSize; c++) {
+                    if (grid[r][c].type === 'white' && grid[r][c].input && !grid[r][c].input.readOnly) {
+                        if (r > row || (r === row && c > col)) {
+                            grid[r][c].input.focus();
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+
+        function moveToPrevious(row, col) {
+            // Encontrar célula anterior editável
+            for (let r = gridSize - 1; r >= 0; r--) {
+                for (let c = gridSize - 1; c >= 0; c--) {
+                    if (grid[r][c].type === 'white' && grid[r][c].input && !grid[r][c].input.readOnly) {
+                        if (r < row || (r === row && c < col)) {
+                            grid[r][c].input.focus();
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+
+        function highlightWord(row, col) {
+            // Remover destaque anterior
+            document.querySelectorAll('.cell.active').forEach(cell => {
+                cell.classList.remove('active');
+            });
+
+            // Destacar palavra atual
+            const wordIndex = grid[row][col].wordIndex;
+            if (wordIndex !== undefined) {
+                const word = words[wordIndex];
+                for (let i = 0; i < word.word.length; i++) {
+                    const r = word.direction === 'down' ? word.row + i : word.row;
+                    const c = word.direction === 'right' ? word.col + i : word.col;
+                    
+                    if (r < gridSize && c < gridSize) {
+                        const cell = document.querySelector(`[data-row="${r}"][data-col="${c}"]`);
+                        cell.classList.add('active');
+                    }
+                }
+            }
+        }
+
+        function checkAnswers() {
+            let correctWords = 0;
+            
+            words.forEach(wordObj => {
+                const { word, row, col, direction } = wordObj;
+                let isCorrect = true;
+                
+                for (let i = 0; i < word.length; i++) {
+                    const r = direction === 'down' ? row + i : row;
+                    const c = direction === 'right' ? col + i : col;
+                    
+                    if (r < gridSize && c < gridSize) {
+                        const input = grid[r][c].input;
+                        if (!input || input.value !== word[i]) {
+                            isCorrect = false;
+                            break;
+                        }
+                    }
+                }
+
+                if (isCorrect) {
+                    correctWords++;
+                    // Marcar palavra como correta
+                    for (let i = 0; i < word.length; i++) {
+                        const r = direction === 'down' ? row + i : row;
+                        const c = direction === 'right' ? col + i : col;
+                        
+                        if (r < gridSize && c < gridSize) {
+                            const cell = document.querySelector(`[data-row="${r}"][data-col="${c}"]`);
+                            cell.classList.add('correct');
+                        }
+                    }
+                }
+            });
+
+            score = correctWords;
+            document.getElementById('score').textContent = score;
+
+            if (score === words.length) {
+                setTimeout(() => {
+                    alert('🎉 Parabéns! Você completou todas as palavras cruzadas!');
+                }, 500);
+            }
+        }
+
+        function clearGrid() {
+            for (let r = 0; r < gridSize; r++) {
+                for (let c = 0; c < gridSize; c++) {
+                    if (grid[r][c].type === 'white' && grid[r][c].input && !grid[r][c].input.readOnly) {
+                        grid[r][c].input.value = '';
+                        const cell = document.querySelector(`[data-row="${r}"][data-col="${c}"]`);
+                        cell.classList.remove('correct', 'active');
+                    }
+                }
+            }
+            score = 0;
+            document.getElementById('score').textContent = score;
+        }
+
+        // Inicializar o jogo
+        initGrid();
+    </script>
+</body>
+</html>
